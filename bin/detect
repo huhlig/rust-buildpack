@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# usage: bin/detect <build-path>
+
+BUILD_PATH=${1:-}
+
+# Check for Cargo.toml in root of build path
+if [ -f "$BUILD_PATH/Cargo.toml" ]; then
+    echo "Rust"
+    exit 0
+else
+    exit 1
+fi
+

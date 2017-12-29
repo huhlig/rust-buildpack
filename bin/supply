@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# usage: bin/supply <build-path> <cache-path> <deps-path> <index>
+
+BUILD_PATH=${1:-}
+CACHE_PATH=${2:-}
+DEPS_PATH=${3:-}
+INDEX=${4:-}
+
+CURL="curl -s -L --retry 15 --retry-delay 2" # retry for up to 30 seconds
+RUSTUP_URI="https://sh.rustup.rs"
+
+# Rust Version Channel
+VERSION=stable
+
+# Bash Error Handling
+set -eu
+
+# Setup Environment File
+cat << EOF > $CACHE_PATH/envsrc.sh
+#!/usr/bin/env bash
+# Rustup installation directory.
+export RUSTUP_HOME="$CACHE_PATH/multirust"
+
+# Cargo installation directory.
+export CARGO_HOME="$CACHE_PATH/cargo"
+
+# Cargo Target Directory
+export CARGO_TARGET_DIR="$CACHE_PATH/target"
+
+# Set cargo binaries in our path.
+export PATH="\$CARGO_HOME/bin:\$PATH"
+
+EOF
+
+# Set our environment to our envsrc
+source $CACHE_PATH/envsrc.sh
+
+# Create and switch to our Cache Path
+mkdir -p "$CACHE_PATH"
+cd "$CACHE_PATH"
+
+# Install or Update Rust Toolchain
+if [ -d "$CARGO_HOME" ]; then
+  echo "-----> Checking for new releases of Rust $VERSION channel"
+  rustup self update
+  rustup update "$VERSION"
+  rustup default "$VERSION"
+else
+  echo "-----> Downloading rustup from $RUSTUP_URI"
+  curl $RUSTUP_URI -sSf > rustup.sh
+  chmod u+x rustup.sh
+  echo "-----> Using rustup to install Rust $VERSION channel"
+  ./rustup.sh -y --default-toolchain "$VERSION"
+  rm rustup.sh
+fi
+
+# Verify we have an working Rust toolchain installed.
+if [ ! -x "$CARGO_HOME/bin/rustc" ]; then
+  echo "failed: Cannot find Rust binaries at $CARGO_HOME"
+  exit 1
+fi

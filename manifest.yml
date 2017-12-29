@@ -1,0 +1,17 @@
+---
+language: rust
+default_versions:
+  - name: rust
+    version: 1.22.1
+url_to_dependency_map:
+  - match: rust-(\d+\.\d+\.\d+)
+    name: rust
+    version: $1
+dependencies:
+  - name: rust
+    md5: a933eb45105c4404b60e486acac1b4b2
+    uri: https://static.rust-lang.org/dist/rust-1.22.1-x86_64-unknown-linux-gnu.tar.gz
+    version: 1.22.1
+    cf_stacks:
+      - cflinuxfs2
+exclude_files: []

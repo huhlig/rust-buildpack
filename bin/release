@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+# Usage: bin/release <build-path>
+
+require 'yaml'
+
+build_path = ARGV[0]
+
+cargo_metadata = File.read("#{build_path}/Cargo.toml")
+cargo_metadata.match /name = \"(.*)\"/
+app_executable = "bin/%s" % $1
+
+release_run_command = {}
+release_run_command['default_process_types'] = {'web' => app_executable}
+puts release_run_command.to_yaml

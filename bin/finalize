@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# usage: bin/finalize <build-path> <cache-path> <deps-path> <index>
+
+BUILD_PATH=${1:-}
+CACHE_PATH=${2:-}
+DEPS_PATH=${3:-}
+INDEX=${4:-}
+
+# Bash Error Handling
+set -eu
+
+# Set our environment to our envsrc
+source $CACHE_PATH/envsrc.sh
+
+# Build application with Cargo
+echo "-----> Building application using Cargo"
+cd $BUILD_PATH
+rm -rf $CARGO_TARGET_DIR
+cargo build --release
+cargo install --root $BUILD_PATH
